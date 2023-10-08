@@ -24,20 +24,6 @@ Calculates the factorial of `n`.
 
 Given the average call duration in seconds and calls initiated per second, it returns the traffic in Erlangs.
 
-### `required_channels(A, target_blocking)`
-
-Given the traffic in Erlangs and a desired blocking probability, it calculates the required number of channels.
-
-## Erlang B Functions
-
-### `erlang_b(N, A)`
-
-Calculates the blocking probability using the Erlang B formula.
-
-### `calculate_erlangs_from_blocking(N, target_blocking)`
-
-Given the blocking probability and available lines, it calculates the traffic in Erlangs.
-
 ### `calls_per_second_from_erlangs(erlangs, call_duration_seconds)`
 
 Given the traffic in Erlangs and average call duration, it calculates the calls initiated per second.
@@ -45,6 +31,20 @@ Given the traffic in Erlangs and average call duration, it calculates the calls 
 ### `call_duration_from_erlangs(erlangs, calls_per_second)`
 
 Given the traffic in Erlangs and calls initiated per second, it calculates the average call duration in seconds.
+
+## Erlang B Functions
+
+### `erlang_b(N, A)`
+
+Calculates the blocking probability using the Erlang B formula.
+
+### `required_channels(A, target_blocking)`
+
+Given the traffic in Erlangs and a desired blocking probability, it calculates the required number of channels.
+
+### `calculate_erlangs_from_blocking(N, target_blocking)`
+
+Given the blocking probability and available lines, it calculates the traffic in Erlangs.
 
 ## Erlang C Functions
 

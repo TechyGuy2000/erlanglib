@@ -1,15 +1,20 @@
 import math
+from decimal import Decimal, getcontext
+
+# Set the precision to a high value
+getcontext().prec = 1000
+
 
 def factorial(n):
-
     """
     Calculate factorial of n.
     """
-
     if n == 0:
-        return 1
-    else:
-        return n * factorial(n - 1)
+        return Decimal(1)
+    result = Decimal(1)
+    for i in range(1, int(n) + 1):
+        result *= i
+    return result
 
 
 def calculate_erlangs(call_duration_seconds, calls_per_second):
@@ -66,7 +71,6 @@ def call_duration_from_erlangs(erlangs, calls_per_second):
 
 
 def erlang_b(N, A):
-
     """
     Calculate the blocking probability using the Erlang B formula.
 
@@ -77,9 +81,12 @@ def erlang_b(N, A):
     Returns:
     - float: blocking probability
     """
+    A, N = Decimal(A), Decimal(N)
+    B = (A ** N) / factorial(N)
+    denominator_summation = sum((A ** i) / factorial(i) for i in range(int(N) + 1))
 
-    B = ((A ** N) / (factorial(N))) / sum((A ** i) / factorial(i) for i in range(N + 1))
-    return B
+    return float(B / denominator_summation)
+
 
 
 def required_channels(A, target_blocking):
@@ -146,10 +153,10 @@ def erlang_c(N, A):
     numerator = (A ** N) / factorial(N) * N / (N - A)
     denominator_summation = sum((A ** i) / factorial(i) for i in range(N))
     denominator = denominator_summation + ((A ** N) / factorial(N)) * N / (N - A)
-    return numerator / denominator
+    return float(numerator / denominator)
+
 
 def service_level(N, A, Pw, target_time_seconds, AHT_seconds):
-
     """
     Calculate the service level given the probability a call is queued, number of agents, traffic in Erlangs, target answer time, and average handle time.
 
@@ -164,11 +171,12 @@ def service_level(N, A, Pw, target_time_seconds, AHT_seconds):
     - float: service level
     """
 
-    exponent = - (N - A) * (target_time_seconds / AHT_seconds)
-    return 1 - Pw * math.exp(exponent)
+    A, N, Pw = Decimal(A), Decimal(N), Decimal(Pw)
+    exponent = - (N - A) * (Decimal(target_time_seconds) / Decimal(AHT_seconds))
+    return float(Decimal(1) - Pw * exponent.exp())
+
 
 def average_speed_of_answer(N, A, Pw, average_handling_time):
-
     """
     Calculate the Average Speed of Answer (ASA) given the probability a call is queued, number of agents, traffic in Erlangs, and average handling time.
 
@@ -181,11 +189,11 @@ def average_speed_of_answer(N, A, Pw, average_handling_time):
     Returns:
     - float: Average Speed of Answer in seconds
     """
+    A, N, Pw, average_handling_time = Decimal(A), Decimal(N), Decimal(Pw), Decimal(average_handling_time)
+    return float((Pw * average_handling_time) / (N - A))
 
-    return (Pw * average_handling_time) / (N - A)
 
 def immediate_answer_percentage(Pw):
-
     """
     Calculate the percentage of calls answered immediately given the probability a call is queued.
 
@@ -195,8 +203,9 @@ def immediate_answer_percentage(Pw):
     Returns:
     - float: percentage of calls answered immediately
     """
+    Pw = Decimal(Pw)
+    return float(Decimal(1) - Pw) * 100
 
-    return (1 - Pw) * 100
 
 def occupancy(A, N):
 
