@@ -4,7 +4,8 @@ from erlanglib import factorial, calculate_erlangs, \
      erlang_b, required_channels, calculate_erlangs_from_blocking, \
      calls_per_second_from_erlangs,call_duration_from_erlangs, \
      erlang_c, service_level, average_speed_of_answer, \
-     immediate_answer_percentage, occupancy, required_agents
+     immediate_answer_percentage, occupancy, required_agents, \
+     calculate_erlangs_seconds, calculate_erlangs_minutes
 
 
 class TestErlangLib(unittest.TestCase):
@@ -26,19 +27,41 @@ class TestErlangLib(unittest.TestCase):
         # factorial 4 = 24
         self.assertEqual(factorial(4), 24)
 
+        # self.assertEqual(factorial(708), 5)
+
     def test_calculate_erlangs(self):
 
-        # For a call duration of 60 seconds (1 minute) and 1 call per second
-        # Erlangs = 1/60 * 3600 = 60
-        self.assertEqual(calculate_erlangs(60, 1), 60)
+        # Testing for half an hour call duration with 120 calls initiated per hour
+        # Expected: 0.5 hours * 120 calls/hour = 60 Erlangs
+        self.assertAlmostEqual(calculate_erlangs(0.5, 120), 60)
 
-        # For a call duration of 120 seconds (2 minutes) and 0.5 calls per second
-        # Erlangs = 2/60 * 0.5 * 3600 = 60
-        self.assertEqual(calculate_erlangs(120, 0.5), 60)
+        # Testing for an hour call duration with 60 calls initiated per hour
+        # Expected: 1 hour * 60 calls/hour = 60 Erlangs
+        self.assertAlmostEqual(calculate_erlangs(1, 60), 60)
 
-        # For a call duration of 30 seconds and 2 calls per second
-        # Erlangs = 0.5/60 * 2 * 3600 = 60
-        self.assertEqual(calculate_erlangs(30, 2), 60)
+        # Testing for no call duration (0 hours) with 60 calls initiated per hour
+        # Expected: 0 hours * 60 calls/hour = 0 Erlangs
+        self.assertAlmostEqual(calculate_erlangs(0, 60), 0)
+
+        # Testing for an hour call duration with no calls initiated (0 calls/hour)
+        # Expected: 1 hour * 0 calls/hour = 0 Erlangs
+        self.assertAlmostEqual(calculate_erlangs(1, 0), 0)
+
+    def test_calculate_erlangs_seconds(self):
+
+        # 1800 seconds is 0.5 hours, 1 call per second is 3600 calls per hour
+        self.assertAlmostEqual(calculate_erlangs_seconds(1800, 1), 0.5 * 3600)
+
+        # 3600 seconds is 1 hour, 0.5 calls per second is 1800 calls per hour
+        self.assertAlmostEqual(calculate_erlangs_seconds(3600, 0.5), 1 * 1800)
+
+    def test_calculate_erlangs_minutes(self):
+
+        # 30 minutes is 0.5 hours, 2 calls per minute is 120 calls per hour
+        self.assertAlmostEqual(calculate_erlangs_minutes(30, 2), 0.5 * 120)
+
+        # 60 minutes is 1 hour, 1 call per minute is 60 calls per hour
+        self.assertAlmostEqual(calculate_erlangs_minutes(60, 1), 1 * 60)
 
     def test_calls_per_second_from_erlangs(self):
 
@@ -58,6 +81,9 @@ class TestErlangLib(unittest.TestCase):
         # For 10 channels (N) and offered load (A) 20 Erlangs =  0.5379631686320729 = 53.8%
         self.assertAlmostEqual(erlang_b(10, 20), 0.53796, places=4)
 
+        # For 2510 channels (N) and offered load (A) 708 Erlangs =  0.0000 = 0.00%
+        self.assertAlmostEqual(erlang_b(2510, 708), 0.0000, places=4)
+
     def test_required_channels(self):
 
         A = 5
@@ -70,6 +96,11 @@ class TestErlangLib(unittest.TestCase):
         # For an offered load (A) 10 Erlangs and a targeted blocking probability (B) of 1% = 18 channels needed
         self.assertEqual(required_channels(A, target_blocking), 18)
 
+        A = 708
+        target_blocking = 0.01
+        # For an offered load (A) 708 Erlangs and a targeted blocking probability (B) of 1% = 736 channels needed
+        self.assertEqual(required_channels(A, target_blocking), 736)
+
     def test_calculate_erlangs_from_blocking(self):
 
         # For 10 channels and target blocking probability 0.0184 (1.84%) = 5
@@ -77,6 +108,8 @@ class TestErlangLib(unittest.TestCase):
 
         # For 10 channels and target blocking probability 0.53796 (53.8%) = 20
         self.assertAlmostEqual(calculate_erlangs_from_blocking(10, 0.53796), 20, places=1)
+
+        self.assertAlmostEqual(calculate_erlangs_from_blocking(2510,0.000001), 2144.77, places=1)
 
     def test_erlang_c(self):
 
@@ -130,7 +163,6 @@ class TestErlangLib(unittest.TestCase):
         N = 14  # Number of agents
         A = 10  # Traffic in Erlangs
         Pw = erlang_c(N, A)
-        print(Pw)
 
         expected_percentage = 82.586
         self.assertAlmostEqual(immediate_answer_percentage(Pw), expected_percentage, places=2)

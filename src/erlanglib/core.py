@@ -17,10 +17,23 @@ def factorial(n):
     return result
 
 
-def calculate_erlangs(call_duration_seconds, calls_per_second):
-
+def calculate_erlangs(call_duration_hours, calls_per_hour):
     """
     Calculate the traffic in Erlangs.
+
+    Parameters:
+    - call_duration_hours (float): Average call duration in hours.
+    - calls_per_hour (float): Calls initiated per hour.
+
+    Returns:
+    - float: traffic in Erlangs
+    """
+    return call_duration_hours * calls_per_hour
+
+
+def calculate_erlangs_seconds(call_duration_seconds, calls_per_second):
+    """
+    Calculate the traffic in Erlangs based on input in seconds.
 
     Parameters:
     - call_duration_seconds (float): Average call duration in seconds.
@@ -29,10 +42,34 @@ def calculate_erlangs(call_duration_seconds, calls_per_second):
     Returns:
     - float: traffic in Erlangs
     """
+    # Convert call duration to hours
+    call_duration_hours = call_duration_seconds / 3600
 
-    call_duration_hours = call_duration_seconds / 3600  # Convert call duration to hours
-    calls_per_hour = calls_per_second * 3600  # Convert calls per second to calls per hour
-    return call_duration_hours * calls_per_hour
+    # Convert calls per second to calls per hour
+    calls_per_hour = calls_per_second * 3600
+
+    return calculate_erlangs(call_duration_hours, calls_per_hour)
+
+
+def calculate_erlangs_minutes(call_duration_minutes, calls_per_minute):
+    """
+    Calculate the traffic in Erlangs based on input in minutes.
+
+    Parameters:
+    - call_duration_minutes (float): Average call duration in minutes.
+    - calls_per_minute (float): Calls initiated per minute.
+
+    Returns:
+    - float: traffic in Erlangs
+    """
+    # Convert call duration to hours
+    call_duration_hours = call_duration_minutes / 60
+
+    # Convert calls per minute to calls per hour
+    calls_per_hour = calls_per_minute * 60
+
+    return calculate_erlangs(call_duration_hours, calls_per_hour)
+
 
 
 def calls_per_second_from_erlangs(erlangs, call_duration_seconds):
@@ -88,7 +125,6 @@ def erlang_b(N, A):
     return float(B / denominator_summation)
 
 
-
 def required_channels(A, target_blocking):
 
     """
@@ -136,6 +172,7 @@ def calculate_erlangs_from_blocking(N, target_blocking, max_iterations=1000, tol
         else:
             high = mid
     return mid  # Return the last calculated value if not converged in max_iterations
+
 
 def erlang_c(N, A):
 
@@ -221,6 +258,7 @@ def occupancy(A, N):
     """
 
     return (A / N) * 100
+
 
 def required_agents(N_raw, shrinkage_percentage):
 
