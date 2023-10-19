@@ -188,7 +188,7 @@ def erlang_c(N, A):
     Returns:
     - float: probability that a call is queued
     """
-
+    A = Decimal(A)
     numerator = (A ** N) / factorial(N) * N / (N - A)
     denominator_summation = sum((A ** i) / factorial(i) for i in range(N))
     denominator = denominator_summation + ((A ** N) / factorial(N)) * N / (N - A)
