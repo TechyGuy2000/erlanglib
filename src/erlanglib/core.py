@@ -28,7 +28,9 @@ def calculate_erlangs(call_duration_hours, calls_per_hour):
     Returns:
     - float: traffic in Erlangs
     """
-    return call_duration_hours * calls_per_hour
+    call_duration_hours = Decimal(call_duration_hours)
+    calls_per_hour = Decimal(calls_per_hour)
+    return float(call_duration_hours * calls_per_hour)
 
 
 def calculate_erlangs_seconds(call_duration_seconds, calls_per_second):
@@ -43,10 +45,10 @@ def calculate_erlangs_seconds(call_duration_seconds, calls_per_second):
     - float: traffic in Erlangs
     """
     # Convert call duration to hours
-    call_duration_hours = call_duration_seconds / 3600
+    call_duration_hours = Decimal(call_duration_seconds) / Decimal(3600)
 
     # Convert calls per second to calls per hour
-    calls_per_hour = calls_per_second * 3600
+    calls_per_hour = Decimal(calls_per_second) * Decimal(3600)
 
     return calculate_erlangs(call_duration_hours, calls_per_hour)
 
@@ -63,10 +65,10 @@ def calculate_erlangs_minutes(call_duration_minutes, calls_per_minute):
     - float: traffic in Erlangs
     """
     # Convert call duration to hours
-    call_duration_hours = call_duration_minutes / 60
+    call_duration_hours = Decimal(call_duration_minutes) / Decimal(60)
 
     # Convert calls per minute to calls per hour
-    calls_per_hour = calls_per_minute * 60
+    calls_per_hour = Decimal(calls_per_minute) * Decimal(60)
 
     return calculate_erlangs(call_duration_hours, calls_per_hour)
 
@@ -103,8 +105,8 @@ def call_duration_from_erlangs(erlangs, calls_per_second):
     - float: Average call duration in seconds.
     """
 
-    calls_per_hour = calls_per_second * 3600
-    return erlangs / calls_per_hour * 3600
+    calls_per_hour = Decimal(calls_per_second) * Decimal(3600)
+    return float(erlangs / calls_per_hour * 3600)
 
 
 def erlang_b(N, A):
